@@ -1,8 +1,10 @@
+#import relevant libraries
 import requests # make a request to retrieve URL page
 from bs4 import BeautifulSoup # HTML parser
 import pandas as pd
 from datetime import datetime
 
+#Send request to the website and introduce yourself
 base_url = "https://realpython.github.io/fake-jobs/"
 header = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"}
 
@@ -16,12 +18,15 @@ else:
 
 print(response_page.text)
 
-
+#Parse the HTML content using BeautifulSoup
 parsed_page = BeautifulSoup(response_page.text, 'html.parser')
 
+#Extact job listings
 job_listing = parsed_page.find_all('div', class_="column is-half")
 
-all_job_listings = []
+all_job_listings = [] #List to store job data
+
+#Loop through each job card and extract required information
 for listing in job_listing:
     job_name = listing.find('h2').text.strip()
     company_name = listing.find('h3').text.strip()
@@ -35,6 +40,7 @@ for listing in job_listing:
     day_month = date_posted.strftime('%d' '%B')
     year = date_posted.year
 
+#Store te job data in the list
     all_job_listings.append({
         'Job Title': job_name,
         'Company Name': company_name,
@@ -44,9 +50,14 @@ for listing in job_listing:
         'Day of Week, Day and Month': day_of_week + ', ' + day_month,
         'Year': year
     })
-   
+
+#Convert list of dictionaries into a Pandas Dataframe
 jobs_df = pd.DataFrame(all_job_listings)
+
+#Display all columns within dataframe
 pd.set_option("display.max_columns", None) 
 
 print(jobs_df)
+
+jobs_df.to_csv('Jobs_Data.csv')
 
